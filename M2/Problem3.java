@@ -21,6 +21,26 @@ public class Problem3 {
         //TODO convert each value to positive
         //set the result to the proper index of the output array
         //hint: don't forget to handle the data types properly
+        //---------UCID: sjc65---------
+        //---------Date: 06/05/2023----
+        /*
+          Explanation: As the code iterates over each value, it checks to see if each value is an
+          integer, double, or string. As each value is being sorted into the three data types, they
+          are each converted into a positive value while retaining their data type.
+        */
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] instanceof Integer) {
+                output[i] = Math.abs((Integer)arr[i]);
+            }
+            
+            else if (arr[i] instanceof Double) {
+                output[i] = Math.abs((Double)arr[i]);
+            }
+
+            else if (arr[i] instanceof String) {
+                output[i] = Math.abs(Double.parseDouble((String)arr[i]));
+            }
+        }
         
         //end edit section
 

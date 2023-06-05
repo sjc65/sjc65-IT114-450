@@ -18,7 +18,23 @@ public class Problem2 {
         double total = 0;
         String totalOutput = "";
         //TODO add/edit code here
-       
+        //---------UCID: sjc65---------
+        //---------Date: 06/05/2023----
+        /*
+          Explanation: As the code iterates over each value in the array sets, the code adds
+          each value to the total sum. The total is then converted to string to change the
+          decimal format to the hundredth place. Then the total is printed for each array set.
+        */
+        double sum = 0.0;
+        String numString = "";
+
+        for (int i = 0; i < arr.length; i++) {
+            sum += arr[i];
+        }
+
+        numString = String.format("%.2f", sum);
+        total = Double.parseDouble(numString);
+
         //set the double to a string variable
         totalOutput = total+"";
         //end add/edit section

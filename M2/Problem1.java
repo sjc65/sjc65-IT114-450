@@ -17,7 +17,19 @@ public class Problem1 {
         System.out.println("Processing Array:" + Arrays.toString(arr));
         System.out.println("Odds output:");
         //TODO add/edit code here
-        
+        //---------UCID: sjc65---------
+        //---------Date: 06/05/2023----
+        /*
+          Explanation: As the code iterates over each value in the array sets, the code checks
+          to see if the value yields a remainder. If the value yields a remainder then
+          it is printed as an "odd output".
+        */
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] % 2 != 0) {
+                System.out.println(arr[i] + " ");
+            }
+        }
+
         //end add/edit section
         System.out.println();
         System.out.println("End process");
