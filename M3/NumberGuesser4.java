@@ -10,6 +10,7 @@ public class NumberGuesser4 {
     private int level = 1;
     private int strikes = 0;
     private int maxStrikes = 5;
+    private int strikesPerLevel = 3;   // <----------- Option 2 implementation variable
     private int number = -1;
     private boolean pickNewRandom = true;
     private Random random = new Random();
@@ -127,8 +128,22 @@ public class NumberGuesser4 {
             win();
             pickNewRandom = true;
         } else {
-            System.out.println("That's wrong");
-            strikes++;
+            /*
+               ---------UCID: sjc65---------
+               ---------Date: 06/12/2023----
+               Explanation: The option 1 feature checks to see if the "guess" is higher or lower than the "number". If the guess is lower than
+               the number, then the terminal prompts the player to guess higher. If the guess is higher than the number, the terminal prompts the player
+               to guess lower. 
+             */
+            //------------------ Option 1 implementation -----------------
+            if (guess < number) {                   
+                System.out.println("Wrong. Choose higher...");
+                strikes++;                                                    
+            } else {
+                System.out.println("Wrong. Choose lower...");
+                strikes++;
+            }  
+            //------------------------------------------------------------                                     
             if (strikes >= maxStrikes) {
                 lose();
                 pickNewRandom = true;
@@ -153,6 +168,44 @@ public class NumberGuesser4 {
             System.out.println("Welcome to NumberGuesser4.0");
             System.out.println("To exit, type the word 'quit'.");
             loadState();
+            /*
+                ---------UCID: sjc65---------
+                ---------Date: 06/12/2023----
+                Explanation: The option 3 feature first prompts the player with the difficulty choices they can choose from. Then it reads the 
+                player's numerical choice with each of the cases in the switch and then assigns it to the "strikesPerLevel" variable. After
+                the player chooses a level, the switch case is exited and the "strikesPerLevel" variable gets assigned to the "maxStrikes" variable.
+            */
+            //------------ Option 3 implementation ------------------------------------------
+                System.out.println("--- Select difficulty level: ---");
+                System.out.println("{ 1 }---> Easy Mode (9 strikes per level)");
+                System.out.println("{ 2 }---> Medium Mode (6 strikes per level)");
+                System.out.println("{ 3 }---> Hard Mode (3 strikes per level)");
+                System.out.println("{ 4 }---> INSANE Mode (1 strike per level)");
+                System.out.println("^Enter the number corresponding with your choice^");
+
+                int diffChoice = input.nextInt();
+                input.nextLine();
+
+                switch (diffChoice) {
+                    case 1: 
+                        strikesPerLevel = 9;
+                        break;
+                    case 2:
+                        strikesPerLevel = 6;
+                        break;
+                    case 3:
+                        strikesPerLevel = 3;
+                        break;
+                    case 4: 
+                        strikesPerLevel = 1;
+                        break;
+                    default:
+                        strikesPerLevel = 3;
+                        break;
+                }
+                
+                maxStrikes = strikesPerLevel;
+                //---------------------------------------------------------------------------
             do {
                 if (pickNewRandom) {
                     generateNewNumber(level);
