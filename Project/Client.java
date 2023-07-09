@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Client {
@@ -97,6 +98,18 @@ public class Client {
         }
         return false;
     }
+    //---------------------------Coin Flip Logic---------------------------
+    private String coinFlip() {
+        Random random = new Random();
+        int toss = random.nextInt(2);
+        //return (toss == 0) ? "heads" : "tails";
+        if (toss == 0) {
+            return "flipped a coin! Result is heads";
+        } else {
+            return "flipped a coin! Result is tails";
+        }
+    }
+    //----------------------------------------------------------------------
 
     /**
      * Controller for handling various text commands.
@@ -125,6 +138,17 @@ public class Client {
         } else if (isName(text)) {
             return true;
         }
+        //---------------------------Coin Flip Command Process---------------------------
+        else if (text.equalsIgnoreCase("/flip")) {
+            String result = coinFlip();
+            try {
+                sendMessage(result);
+            } catch (IOException e) {
+                System.out.println("Error sending message to server: " + e.getMessage());
+            }
+            return true;
+        }
+        //--------------------------------------------------------------------------------
         return false;
     }
 
