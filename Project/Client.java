@@ -13,6 +13,9 @@ public class Client {
     Socket server = null;
     ObjectOutputStream out = null;
     ObjectInputStream in = null;
+    //--------------------------------
+    private long connectionTime = 0;
+    //--------------------------------
     final String ipAddressPattern = "/connect\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d{3,5})";
     final String localhostPattern = "/connect\\s+(localhost:\\d{3,5})";
     boolean isRunning = false;
@@ -102,7 +105,6 @@ public class Client {
     private String coinFlip() {
         Random random = new Random();
         int toss = random.nextInt(2);
-        //return (toss == 0) ? "heads" : "tails";
         if (toss == 0) {
             return "flipped a coin! Result is heads";
         } else {
@@ -157,7 +159,12 @@ public class Client {
         Payload p = new Payload();
         p.setPayloadType(PayloadType.CONNECT);
         p.setClientName(clientName);
+        //----------------
+        p.setStamp(System.currentTimeMillis());
+        //----------------
         out.writeObject(p);
+
+        connectionTime = System.currentTimeMillis();
     }
 
     private void sendMessage(String message) throws IOException {
@@ -165,6 +172,9 @@ public class Client {
         p.setPayloadType(PayloadType.MESSAGE);
         p.setMessage(message);
         p.setClientName(clientName);
+        //-----------------
+        p.setStamp(System.currentTimeMillis());
+        //-----------------
         out.writeObject(p);
     }
 

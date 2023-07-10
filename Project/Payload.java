@@ -1,5 +1,9 @@
 package Project;
 import java.io.Serializable;
+//----------------
+import java.text.SimpleDateFormat;
+import java.util.Date;
+//----------------
 public class Payload implements Serializable {
     //read https://www.baeldung.com/java-serial-version-uid
     private static final long serialVersionUID = 1L;//change this if the class changes
@@ -47,10 +51,25 @@ public class Payload implements Serializable {
     public void setNumber(int number) {
         this.number = number;
     }
-
+//---------------------------------------------------------------------------
+    /**
+     * Displays time stamp of the message
+     */
+    private long timeStamp;
+    private String format;
+    public String getStamp() {
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        Date date = new Date(timeStamp);
+        format = sdf.format(date);
+        return format;
+    }
+    public void setStamp(long timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+//----------------------------------------------------------------------------
     @Override
     public String toString() {
-	return String.format("Type[%s], Number[%s], Message[%s]", getPayloadType().toString(), getNumber(),
-		getMessage());
+	return String.format("Type[%s], Number[%s], Message[%s], Timestamp[%s]", getPayloadType().toString(), getNumber(),
+		getMessage(), getStamp());
     }
 }
