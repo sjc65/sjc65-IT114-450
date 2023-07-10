@@ -52,8 +52,16 @@ public class Payload implements Serializable {
         this.number = number;
     }
 //---------------------------------------------------------------------------
+/*
+    UCID: sjc65
+    Date: 07/09/2023
+    Explanation: The code adds the timestamp to the payload attributes, which is displayed in the "debug info" on the client-side.
+    The "getStamp()" function creates a "simpleDateFormat" object with the "hours:minutes:seconds" format. Then it creates a "Date"
+    object using the "timeStamp" variable as a parameter. The code is essentially formatting the timeStamp variable into the given
+    format, which is then called in the toString() function to be displayed with the other payload attributes.
+ */
     /**
-     * Displays time stamp of the message
+     * Displays timestamp of the message
      */
     private long timeStamp;
     private String format;
