@@ -123,6 +123,26 @@ public class ServerThread extends Thread {
             cleanup();
         }
     }
+//----------------------------------Text Formatting----------------------------------
+/*
+    UCID: sjc65
+    Date: 07/11/2023
+    Explanation: This function takes in "message" as a parameter. then the "replaceAll()" function is used on the "message"
+    based on what special characters are wrapped around the text. Then the special characters in the message are replaced by 
+    the associated tags and returned.
+*/
+    private String formatText(String message) {
+        return message.replaceAll("\\*\\*(.*?)\\*\\*", "<b>$1</b>")     // Bold Format
+                      .replaceAll("\\*(.*?)\\*", "<i>$1</i>")           // Italics Format
+                      .replaceAll("_(.*?)_", "<u>$1</u>")               // Underlined Format
+
+                      //NOTE: If UI is in HTML, replace the second values (after regex) with actual HTML tags for text color.
+                      .replaceAll("!(.*?)!", "<red>$1<red>")            // Red text color
+                      .replaceAll("\\+(.*?)\\+", "<green>$1<green>")    // Green text color
+                      .replaceAll("\\-(.*?)\\-", "<blue>$1<blue>");     // Blue text color
+                      
+    }
+//------------------------------------------------------------------------------------
     //------------------------------------------------------
     private void setPayloadTimestamp(Payload payload) {
         long currentTimeStamp = System.currentTimeMillis();
@@ -138,7 +158,18 @@ public class ServerThread extends Thread {
                 break;
             case MESSAGE:
                 if (currentRoom != null) {
-                    currentRoom.sendMessage(this, p.getMessage());
+//----------------------------------Message Format Rerouter----------------------------------
+/*
+    UCID: sjc65
+    Date: 07/11/2023
+    Explanation: This code assigns the "formatText(p.getMessage())"" function call, with "p.getMessage()" as its parameter,
+    to the "formattedMessage" String variable. Then "formattedMessage" is used in the "currentRoom.sendMessage()" function.
+    Essentially, rerouting the usual message thread through the "formatText()" method first.
+*/
+                    String formattedMessage = formatText(p.getMessage());
+                    currentRoom.sendMessage(this, formattedMessage);
+                    //currentRoom.sendMessage(this, p.getMessage());
+//-------------------------------------------------------------------------------------------
                 } else {
                     // TODO migrate to lobby
                     Room.joinRoom("lobby", this);

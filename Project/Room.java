@@ -150,6 +150,7 @@ public class Room implements AutoCloseable{
     	sendMessage(client, message);
 	}	
 //-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------
 	/***
 	 * Helper function to process messages to trigger different functionality.
 	 * 
@@ -225,12 +226,7 @@ public class Room implements AutoCloseable{
 						wasCommand = false;
 						break;
 				}
-			}
-//---------------------------------------------------------------------------------------
-			else {
-
-			}
-//---------------------------------------------------------------------------------------
+			} 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
