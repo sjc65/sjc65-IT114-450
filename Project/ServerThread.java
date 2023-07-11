@@ -65,6 +65,9 @@ public class ServerThread extends Thread {
         p.setPayloadType(PayloadType.MESSAGE);
         p.setClientName(from);
         p.setMessage(message);
+        //-----------------------
+        setPayloadTimestamp(p);
+        //-----------------------
         return send(p);
     }
     public boolean sendConnectionStatus(String who, boolean isConnected){
@@ -120,7 +123,12 @@ public class ServerThread extends Thread {
             cleanup();
         }
     }
-
+    //------------------------------------------------------
+    private void setPayloadTimestamp(Payload payload) {
+        long currentTimeStamp = System.currentTimeMillis();
+        payload.setStamp(currentTimeStamp);
+    }
+    //------------------------------------------------------
     void processMessage(Payload p) {
         switch (p.getPayloadType()) {
             case CONNECT:
