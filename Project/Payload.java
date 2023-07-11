@@ -1,5 +1,9 @@
 package Project;
 import java.io.Serializable;
+//----------------
+import java.text.SimpleDateFormat;
+import java.util.Date;
+//----------------
 public class Payload implements Serializable {
     //read https://www.baeldung.com/java-serial-version-uid
     private static final long serialVersionUID = 1L;//change this if the class changes
@@ -47,10 +51,33 @@ public class Payload implements Serializable {
     public void setNumber(int number) {
         this.number = number;
     }
-
+//---------------------------------------------------------------------------
+/*
+    UCID: sjc65
+    Date: 07/09/2023
+    Explanation: The code adds the timestamp to the payload attributes, which is displayed in the "debug info" on the client-side.
+    The "getStamp()" function creates a "simpleDateFormat" object with the "hours:minutes:seconds" format. Then it creates a "Date"
+    object using the "timeStamp" variable as a parameter. The code is essentially formatting the timeStamp variable into the given
+    format, which is then called in the toString() function to be displayed with the other payload attributes.
+ */
+    /**
+     * Displays timestamp of the message
+     */
+    private long timeStamp;
+    private String format;
+    public String getStamp() {
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        Date date = new Date(timeStamp);
+        format = sdf.format(date);
+        return format;
+    }
+    public void setStamp(long timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+//----------------------------------------------------------------------------
     @Override
     public String toString() {
-	return String.format("Type[%s], Number[%s], Message[%s]", getPayloadType().toString(), getNumber(),
-		getMessage());
+	return String.format("Type[%s], Number[%s], Message[%s], Timestamp[%s]", getPayloadType().toString(), getNumber(),
+		getMessage(), getStamp());
     }
 }
