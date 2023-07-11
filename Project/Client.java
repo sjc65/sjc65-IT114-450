@@ -5,7 +5,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Random;
 import java.util.Scanner;
 
 public class Client {
@@ -101,24 +100,6 @@ public class Client {
         }
         return false;
     }
-    //---------------------------Coin Flip Logic---------------------------
-     /*
-        UCID: sjc65
-        Date: 07/09/2023
-        Explanation: The "coinFlip()" function creates an object called "random". Then the object is used in the "nextInt()"
-        function with the bounds of 2 and assigned to the "toss" variable. An if-statement checks whether the result in
-        the toss variable is a 1 or 0. If toss equals 1, then it returns heads, otherwise it returns tails.
-    */
-    private String coinFlip() {
-        Random random = new Random();
-        int toss = random.nextInt(2);
-        if (toss == 0) {
-            return "flipped a coin! Result is heads";
-        } else {
-            return "flipped a coin! Result is tails";
-        }
-    }
-    //----------------------------------------------------------------------
 
     /**
      * Controller for handling various text commands.
@@ -147,24 +128,6 @@ public class Client {
         } else if (isName(text)) {
             return true;
         }
-        //---------------------------Coin Flip Command Process---------------------------
-        /*
-            UCID: sjc65
-            Date: 07/09/2023
-            Explanation: the code first checks if the text says "/flip", if it does then the "coinFlip()" command is called
-            and assigned to "result". Then "result" is used as a parameter in the "sendMessage()" function which is then
-            broadcasted to all the clients.
-        */
-        else if (text.equalsIgnoreCase("/flip")) {
-            String result = coinFlip();
-            try {
-                sendMessage(result);
-            } catch (IOException e) {
-                System.out.println("Error sending message to server: " + e.getMessage());
-            }
-            return true;
-        }
-        //--------------------------------------------------------------------------------
         return false;
     }
 

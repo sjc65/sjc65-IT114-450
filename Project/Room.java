@@ -3,6 +3,7 @@ package Project;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 public class Room implements AutoCloseable{
 	protected static Server server;// used to refer to accessible server functions
@@ -16,6 +17,7 @@ public class Room implements AutoCloseable{
 	private final static String DISCONNECT = "disconnect";
 	private final static String LOGOUT = "logout";
 	private final static String LOGOFF = "logoff";
+	private final static String FLIP = "flip";
 
 	public Room(String name) {
 		this.name = name;
@@ -82,7 +84,29 @@ public class Room implements AutoCloseable{
 			close();
 		}
 	}
+//-------------------------------Coin Flip Function-------------------------------------------------------
+/*
+    UCID: sjc65
+    Date: 07/09/2023
+    Explanation: The "coinFlip()" function creates a random object called "rand" and a String variable called "message". 
+	The ".nextInt(2)" is used on the rand object to randomize between 0 and 1 and then assign the result of it to the 
+	"result" variable. If the result is equal to 0, then the message's value is "heads" otherwise the value is "tails".
+	Lastly, the "message" variable is used in the "sendMessage" parameters to be displayed to all clients.
+*/
+	protected synchronized void coinFlip(ServerThread client) {
+		String message;
+		Random rand = new Random();
 
+		int result = rand.nextInt(2);
+    	if(result == 0) {
+    		message = " flipped a coin! Result is heads";
+		} else {
+    		message = " flipped a coin! Result is tails";
+		}
+		
+		sendMessage(client, message);
+    }
+//----------------------------------------------------------------------------------------------------------
 	/***
 	 * Helper function to process messages to trigger different functionality.
 	 * 
@@ -114,12 +138,23 @@ public class Room implements AutoCloseable{
 					case LOGOFF:
 						Room.disconnectClient(client, this);
 						break;
+//-----------------------Coin Flip Command Process--------------------------------------
+					case FLIP:
+						coinFlip(client);
+						wasCommand = true;
+						break;	
+//---------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
 					default:
 						wasCommand = false;
 						break;
 				}
+			}
+//---------------------------------------------------------------------------------------
+			else {
 
 			}
+//---------------------------------------------------------------------------------------
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
