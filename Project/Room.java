@@ -18,6 +18,7 @@ public class Room implements AutoCloseable{
 	private final static String LOGOUT = "logout";
 	private final static String LOGOFF = "logoff";
 	private final static String FLIP = "flip";
+	private final static String ROLL = "roll";
 
 	public Room(String name) {
 		this.name = name;
@@ -106,7 +107,49 @@ public class Room implements AutoCloseable{
 		
 		sendMessage(client, message);
     }
-//----------------------------------------------------------------------------------------------------------
+//----------------------Dice Roll Format: /roll #-----------------------------------------------------------
+/*
+	UCID: sjc65
+	Date: 07/11/2023
+	Explanation: In the "diceRoll()" method, it uses "num" as it's parameter and processes the "/roll #" command format.
+	First a Random object, called rand, is created, then "rand.nextInt(num)" is used to return a random value between
+	0 and num, then that value is assigned to the "result" variable. Lastly, it is appended to a string and assigned to
+	the "message" variable which is then used in the "sendMessage(client, message)" function
+*/
+	protected synchronized void diceRoll(ServerThread client, int num) {
+		Random rand = new Random();
+		int result = rand.nextInt(num);
+		String message = String.format(" rolled a number 0 - %d! Result is %d.", num, result);
+		sendMessage(client, message);
+	}
+//--------------------------------------------------------------------------------------------------------
+//-------------------Dice Roll Format: /roll #d#----------------------------------------------------------
+/*
+	UCID: sjc65
+	Date: 07/11/2023
+	Explanation: In the "diceRoll()" method, it uses "num" and "sides" as it's parameters and processes the "/roll #d#" 
+	command format. First a random object and string variable are created, rand and rollResults respectively. In the for-loop,
+	"num" is used as the iteration limit. Through each iteration, the "roll" integer variable is assigned the value of
+	the result of "rand.nextInt(sides) + 1", which randomly chooses a number between 1 and "sides" and appends that to "rollResults".  
+	If "i" is less than "num" - 1, a comma is appended to rollResults as well. Lastly, the string results are assigned to "message"
+	and then "message" is used in the "diceRoll(client, message)" function call.
+*/
+	protected synchronized void diceRoll(ServerThread client, int num, int sides) {
+		Random rand = new Random();
+		String rollResults = "";
+	
+		for (int i = 0; i < num; i++) {
+        	int roll = rand.nextInt(sides) + 1;
+			rollResults += roll;
+        
+			if (i < num - 1) {
+            	rollResults += ", ";
+        	}
+		}
+		String message = String.format(" rolled %dd%d! Results are %s.", num, sides, rollResults);
+    	sendMessage(client, message);
+	}	
+//-------------------------------------------------------------------------------------------------------
 	/***
 	 * Helper function to process messages to trigger different functionality.
 	 * 
@@ -139,11 +182,44 @@ public class Room implements AutoCloseable{
 						Room.disconnectClient(client, this);
 						break;
 //-----------------------Coin Flip Command Process--------------------------------------
+/*
+	UCID: sjc65
+	Date: 07/10/2023
+	Explanation: the case takes in a string variable called "FLIP"(which is "flip") and uses "client" as the parameter
+	in the function call. Then "wasCommand" is set to true to imply that the case had a command, and lastly a break statement
+	to end the case.
+*/
 					case FLIP:
 						coinFlip(client);
 						wasCommand = true;
-						break;	
-//---------------------------------------------------------------------------------------
+						break;
+//---------------------------------------------------------------------------------------	
+//-----------------------Dice Roll Command Process---------------------------------------
+/*
+	UCID: sjc65
+	Date: 07/11/2023
+	Explanation: In the Case ROLL, the code first checks if the string "comm2[1]" contains the letter "d". If it does then
+	the "#d#"" roll format code is executed. The x and y char variables have the values of "comm2[1].charAt(0)" and 
+	"comm2[1].charAt(2)", respectively, assigned to them. Then the characters are converted to ints and assigned to the int
+	variables, num and sides. They are then used in the parameters of the diceRoll function call. If the string "comm2[1]"
+	does not contain the letter "d" then "comm2[1]" is used in "Integer.parseInt(comm2[1])" to convert the string to an int.
+	Then "num" is used in the parameter of the diceRoll function call.
+*/
+					case ROLL:
+						if(comm2[1].contains("d")) {
+							char x = comm2[1].charAt(0);
+        					char y = comm2[1].charAt(2);
+							int num = Character.getNumericValue(x);
+        					int sides = Character.getNumericValue(y);
+							diceRoll(client, num, sides);
+							wasCommand = true;
+							break;
+						} else {
+							int num = Integer.parseInt(comm2[1]);
+							diceRoll(client, num);	
+							wasCommand = true;
+							break;
+						}
 //---------------------------------------------------------------------------------------
 					default:
 						wasCommand = false;
