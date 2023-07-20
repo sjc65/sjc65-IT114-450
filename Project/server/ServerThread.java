@@ -184,6 +184,18 @@ public class ServerThread extends Thread {
             cleanup();
         }
     }
+//-----------------------------------------------------------------------------------
+private String formatText(String message) {
+    return message.replaceAll("\\*\\*(.*?)\\*\\*", "<b>$1</b>")     // Bold Format
+                  .replaceAll("\\*(.*?)\\*", "<i>$1</i>")           // Italics Format
+                  .replaceAll("_(.*?)_", "<u>$1</u>")               // Underlined Format
+
+                  .replaceAll("!(.*?)!", "<red>$1<red>")            // Red text color
+                  .replaceAll("\\+(.*?)\\+", "<green>$1<green>")    // Green text color
+                  .replaceAll("\\-(.*?)\\-", "<blue>$1<blue>");     // Blue text color
+                  
+}
+//-----------------------------------------------------------------------------------
 
     void processPayload(Payload p) {
         switch (p.getPayloadType()) {
@@ -195,7 +207,11 @@ public class ServerThread extends Thread {
                 break;
             case MESSAGE:
                 if (currentRoom != null) {
-                    currentRoom.sendMessage(this, p.getMessage());
+//------------------------------------------------------------------------------------
+                    String formattedMessage = formatText(p.getMessage());
+                    currentRoom.sendMessage(this, formattedMessage);
+//------------------------------------------------------------------------------------
+                    //currentRoom.sendMessage(this, p.getMessage());
                 } else {
                     // TODO migrate to lobby
                     logger.log(Level.INFO, "Migrating to lobby on message with null room");

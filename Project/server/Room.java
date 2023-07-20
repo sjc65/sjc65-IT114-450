@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,6 +21,8 @@ public class Room implements AutoCloseable {
 	private final static String DISCONNECT = "disconnect";
 	private final static String LOGOUT = "logout";
 	private final static String LOGOFF = "logoff";
+	private final static String FLIP = "flip";
+	private final static String ROLL = "roll";
 	private static Logger logger = Logger.getLogger(Room.class.getName());
 
 	public Room(String name) {
@@ -78,6 +81,45 @@ public class Room implements AutoCloseable {
 			close();
 		}
 	}
+	//-------------------------------------------------------------
+	protected synchronized void coinFlip(ServerThread client) {
+		String message;
+		Random rand = new Random();
+
+		int result = rand.nextInt(2);
+    	if(result == 0) {
+    		message = " flipped a coin! Result is heads";
+		} else {
+    		message = " flipped a coin! Result is tails";
+		}
+		
+		sendMessage(client, message);
+    }
+	//-------------------------------------------------------------
+	//-------------------------------------------------------------
+	protected synchronized void diceRoll(ServerThread client, int num) {
+		Random rand = new Random();
+		int result = rand.nextInt(num);
+		String message = String.format(" rolled a number 0 - %d! Result is %d.", num, result);
+		sendMessage(client, message);
+	}
+
+	protected synchronized void diceRoll(ServerThread client, int num, int sides) {
+		Random rand = new Random();
+		String rollResults = "";
+	
+		for (int i = 0; i < num; i++) {
+        	int roll = rand.nextInt(sides) + 1;
+			rollResults += roll;
+        
+			if (i < num - 1) {
+            	rollResults += ", ";
+        	}
+		}
+		String message = String.format(" rolled %dd%d! Results are %s.", num, sides, rollResults);
+    	sendMessage(client, message);
+	}	
+	//-------------------------------------------------------------
 
 	/***
 	 * Helper function to process messages to trigger different functionality.
@@ -110,6 +152,27 @@ public class Room implements AutoCloseable {
 					case LOGOFF:
 						Room.disconnectClient(client, this);
 						break;
+//------------------------------------------------------------------------------------
+					case FLIP:
+						coinFlip(client);
+						wasCommand = true;
+						break;
+					case ROLL:
+						if(comm2[1].contains("d")) {
+							char x = comm2[1].charAt(0);
+        					char y = comm2[1].charAt(2);
+							int num = Character.getNumericValue(x);
+        					int sides = Character.getNumericValue(y);
+							diceRoll(client, num, sides);
+							wasCommand = true;
+							break;
+						} else {
+							int num = Integer.parseInt(comm2[1]);
+							diceRoll(client, num);	
+							wasCommand = true;
+							break;
+						}
+//------------------------------------------------------------------------------------
 					default:
 						wasCommand = false;
 						break;
