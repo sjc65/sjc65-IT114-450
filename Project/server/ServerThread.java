@@ -185,6 +185,13 @@ public class ServerThread extends Thread {
         }
     }
 //-----------------------------------------------------------------------------------
+/*
+ * UCID: sjc65
+ * Date: 07/21/2023
+ * Explanation: This function takes in "message" as a parameter. then the "replaceAll()" function is used on the "message"
+    based on what special characters are wrapped around the text. Then the special characters in the message are replaced by 
+    the associated tags and returned.
+ */
 private String formatText(String message) {
     return message.replaceAll("\\*\\*(.*?)\\*\\*", "<b>$1</b>")     // Bold Format
                   .replaceAll("\\*(.*?)\\*", "<i>$1</i>")           // Italics Format
@@ -208,10 +215,16 @@ private String formatText(String message) {
             case MESSAGE:
                 if (currentRoom != null) {
 //------------------------------------------------------------------------------------
+/*
+ * UCID: sjc65
+    Date: 07/21/2023
+    Explanation: This code assigns the "formatText(p.getMessage())"" function call, with "p.getMessage()" as its parameter,
+    to the "formattedMessage" String variable. Then "formattedMessage" is used in the "currentRoom.sendMessage()" function.
+    Essentially, rerouting the usual message thread through the "formatText()" method first.
+ */
                     String formattedMessage = formatText(p.getMessage());
                     currentRoom.sendMessage(this, formattedMessage);
 //------------------------------------------------------------------------------------
-                    //currentRoom.sendMessage(this, p.getMessage());
                 } else {
                     // TODO migrate to lobby
                     logger.log(Level.INFO, "Migrating to lobby on message with null room");

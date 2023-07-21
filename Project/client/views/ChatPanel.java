@@ -151,21 +151,35 @@ public class ChatPanel extends JPanel {
     public void addText(String text) {
     JPanel content = chatArea;
 //----------------------------------------------------------------------------------------------------------------------
-        //
+/*
+ * UCID: sjc65
+ * Date: 07/21/2023
+ * Explanation: This code simply translates the textformatting commands from the ServerThread.java from Milestone2 into HTML tags 
+ * using regex. It receives the messages from the client-side and then outputs the final result which replaces the product of
+ * the ServerThread.java textformatting and replaces it with real HTML code. The JeditorPane "textContainer" translates
+ * the HTML into a visual style rather than just labels.
+ */
+        // Translates to bold font
         text = text.replaceAll("<b>(.*?)</b>", "<b style=\"font-weight:bold;\">$1</b>");
-        //
+        
+        // Translates to italic font
         text = text.replaceAll("<i>(.*?)</i>", "<i style=\"font-style:italic;\">$1</i>");
-        //
+        
+        // Translates to underline font
         text = text.replaceAll("<u>(.*?)</u>", "<u style=\"text-decoration:underline;\">$1</u>");
-        //
+        
+        // Translates to red color font
         text = text.replaceAll("<red>(.*?)</red>", "<font color=\"red\">$1</font>");
-        //
+        
+        // Translates to blue color font
         text = text.replaceAll("<blue>(.*?)</blue>", "<font color=\"blue\">$1</font>");
-        //
+        
+        // Translates to green color font
         text = text.replaceAll("<green>(.*?)</green>", "<font color=\"green\">$1</font>");
-//-----------------------------------------------------------------------------------------------------------------------
+
         // add message
         JEditorPane textContainer = new JEditorPane("text/html", text);
+//-----------------------------------------------------------------------------------------------------------------------
 
         // sizes the panel to attempt to take up the width of the container
         // and expand in height based on word wrapping

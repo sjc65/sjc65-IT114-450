@@ -81,25 +81,47 @@ public class Room implements AutoCloseable {
 			close();
 		}
 	}
-	//-------------------------------------------------------------
+	//--------------------------------------------------------------------------------------------------
+	/*
+	 * UCID: sjc65
+	 * Date: 07/21/2023
+	 * Explanation: In the function "coinFlip()", it takes in "client" parameter from ServerThread class. 
+	 * A String message and Random rand object are created. The result variable takes in a random number between 1 and 0.
+	 * if the result is equal to 0, message is equal to heads(wrapped in bold tags) else message is equal to 
+	 * tails(wrapped in bold tags). Then message is used as a parameter in the sendMessage() function call.
+	 */
 	protected synchronized void coinFlip(ServerThread client) {
 		String message;
 		Random rand = new Random();
 
 		int result = rand.nextInt(2);
     	if(result == 0) {
+		// The string wraps the selected text in bold tags (<b></b>) which are applied once the message is sent.
     		message = " flipped a coin! Result is <b>heads</b>";
 		} else {
+		// The string wraps the selected text in bold tags (<b></b>) which are applied once the message is sent.
     		message = " flipped a coin! Result is <b>tails</b>";
 		}
 		
 		sendMessage(client, message);
     }
-	//-------------------------------------------------------------
-	//-------------------------------------------------------------
+	//--------------------------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------------------------------
+	/*
+	 * UCID: sjc65
+	 * Date: 07/21/2023
+	 * Explanation: For the first diceRoll() method, it assigns the random number of the num parameter to the result to randomize
+	 * the diceRoll() method parameter. Then it assigns the text, num, and result to the message to be used as a parameter in
+	 * the sendMessage() function call. The message has bold tags around "0 - %d" and "%d" to display the 0 to # and result in
+	 * bold font. In the second diceRoll() method, it takes num and sides as parameters. for every "i" in num, the dice are rolled
+	 * to a random number from 0 to the number of sides of the dice. Then the results are applied to rollResults at the end of
+	 * each loop. Which is then assigned to message and used as a parameter in the sendMessage() function call. The message has
+	 * "%dd%d" and "%s" bolded.
+	 */
 	protected synchronized void diceRoll(ServerThread client, int num) {
 		Random rand = new Random();
 		int result = rand.nextInt(num);
+		// The string wraps the selected text in bold tags (<b></b>) which are applied once the message is sent.
 		String message = String.format(" rolled a number <b>0 - %d</b>! Result is <b>%d</b>.", num, result);
 		sendMessage(client, message);
 	}
@@ -116,10 +138,11 @@ public class Room implements AutoCloseable {
             	rollResults += ", ";
         	}
 		}
+		// The string wraps the selected text in bold tags (<b></b>) which are applied once the message is sent.
 		String message = String.format(" rolled <b>%dd%d</b>! Results are <b>%s</b>.", num, sides, rollResults);
     	sendMessage(client, message);
 	}	
-	//------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------------
 
 	/***
 	 * Helper function to process messages to trigger different functionality.
@@ -153,6 +176,15 @@ public class Room implements AutoCloseable {
 						Room.disconnectClient(client, this);
 						break;
 //------------------------------------------------------------------------------------
+/*
+ * UCID: sjc65
+ * Date: 07/21/2023
+ * Explanation: In case FLIP (/flip command), the coinFlip method is called and takes in client as a parameter, 
+ * then wasCommand is set to true and lastly the break statement is used to exit the cases. In case ROLL, 
+ * if the /roll command contains "d" then it is parsed to retrieve the first and last numbers(num and sides respectively).
+ * Then they are used in the diceRoll function call, wasCommand is set to true, and the break statement is used to exit
+ * the cases.
+ */
 					case FLIP:
 						coinFlip(client);
 						wasCommand = true;
@@ -181,7 +213,12 @@ public class Room implements AutoCloseable {
 /*
  * UCID: sjc65
  * Date: 07/20/2023
- * Explanation:
+ * Explanation: First the code checks if the start of the text statement begins with "@", if it does then the statement
+ * is split to retrieve the recipientName and the privateMessage. In the synchronized(clients) block, it access the 
+ * list of clients that are active. For every clients in the recipient of ServerThread, it checks if client name matches
+ * the recipient name. If it does, then a message is displayed to the sender on who the private message was sent to in bold
+ * and then the private message is sent to the client ID rather than the user name in order for the client to privately recieve 
+ * the message. Then the break statement is used to end the code block and finally wasCommand is set to true.
  */
 			} else if (message.startsWith("@")) {
 			String[] comm = message.split(" ", 2);
