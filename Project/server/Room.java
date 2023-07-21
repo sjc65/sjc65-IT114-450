@@ -119,7 +119,7 @@ public class Room implements AutoCloseable {
 		String message = String.format(" rolled <b>%dd%d</b>! Results are <b>%s</b>.", num, sides, rollResults);
     	sendMessage(client, message);
 	}	
-	//-------------------------------------------------------------
+	//------------------------------------------------------------------------
 
 	/***
 	 * Helper function to process messages to trigger different functionality.
@@ -177,7 +177,33 @@ public class Room implements AutoCloseable {
 						wasCommand = false;
 						break;
 				}
+//------------------------------------------------------------------------------------
+/*
+ * UCID: sjc65
+ * Date: 07/20/2023
+ * Explanation:
+ */
+			} else if (message.startsWith("@")) {
+			String[] comm = message.split(" ", 2);
+			String recipientName = comm[0].substring(1); 
+			String privateMessage = comm[1];
+
+			synchronized (clients) {
+				for (ServerThread recipient : clients) {
+					if (recipient.getClientName().equals(recipientName)) {
+						recipient.sendMessage(client.getClientId(),
+						"(Private message from <b>" + client.getClientName() + "</b>): " + privateMessage);
+						
+						client.sendMessage(client.getClientId(),
+						"(Private message to <b>" + recipientName + "</b>): " + privateMessage);
+						
+						break;
+					}
+				}
 			}
+			wasCommand = true;
+		}
+//------------------------------------------------------------------------------------
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
