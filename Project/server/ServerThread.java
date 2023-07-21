@@ -190,9 +190,9 @@ private String formatText(String message) {
                   .replaceAll("\\*(.*?)\\*", "<i>$1</i>")           // Italics Format
                   .replaceAll("_(.*?)_", "<u>$1</u>")               // Underlined Format
 
-                  .replaceAll("!(.*?)!", "<red>$1<red>")            // Red text color
-                  .replaceAll("\\+(.*?)\\+", "<green>$1<green>")    // Green text color
-                  .replaceAll("\\-(.*?)\\-", "<blue>$1<blue>");     // Blue text color
+                  .replaceAll("!(.*?)!", "<red>$1</red>")            // Red text color
+                  .replaceAll("\\+(.*?)\\+", "<green>$1</green>")    // Green text color
+                  .replaceAll("\\-(.*?)\\-", "<blue>$1</blue>");     // Blue text color
                   
 }
 //-----------------------------------------------------------------------------------

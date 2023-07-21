@@ -88,9 +88,9 @@ public class Room implements AutoCloseable {
 
 		int result = rand.nextInt(2);
     	if(result == 0) {
-    		message = " flipped a coin! Result is heads";
+    		message = " flipped a coin! Result is <b>heads</b>";
 		} else {
-    		message = " flipped a coin! Result is tails";
+    		message = " flipped a coin! Result is <b>tails</b>";
 		}
 		
 		sendMessage(client, message);
@@ -100,7 +100,7 @@ public class Room implements AutoCloseable {
 	protected synchronized void diceRoll(ServerThread client, int num) {
 		Random rand = new Random();
 		int result = rand.nextInt(num);
-		String message = String.format(" rolled a number 0 - %d! Result is %d.", num, result);
+		String message = String.format(" rolled a number <b>0 - %d</b>! Result is <b>%d</b>.", num, result);
 		sendMessage(client, message);
 	}
 
@@ -116,7 +116,7 @@ public class Room implements AutoCloseable {
             	rollResults += ", ";
         	}
 		}
-		String message = String.format(" rolled %dd%d! Results are %s.", num, sides, rollResults);
+		String message = String.format(" rolled <b>%dd%d</b>! Results are <b>%s</b>.", num, sides, rollResults);
     	sendMessage(client, message);
 	}	
 	//-------------------------------------------------------------

@@ -10,8 +10,11 @@ import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -22,6 +25,7 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.text.html.CSS;
 
 import Project.client.Card;
 import Project.client.Client;
@@ -149,9 +153,23 @@ public class ChatPanel extends JPanel {
         userListPanel.clearUserList();
     }
     public void addText(String text) {
-        JPanel content = chatArea;
+    JPanel content = chatArea;
+//----------------------------------------------------------------------------------------------------------------------
+        //
+        text = text.replaceAll("<b>(.*?)</b>", "<b style=\"font-weight:bold;\">$1</b>");
+        //
+        text = text.replaceAll("<i>(.*?)</i>", "<i style=\"font-style:italic;\">$1</i>");
+        //
+        text = text.replaceAll("<u>(.*?)</u>", "<u style=\"text-decoration:underline;\">$1</u>");
+        //
+        text = text.replaceAll("<red>(.*?)</red>", "<font color=\"red\">$1</font>");
+        //
+        text = text.replaceAll("<blue>(.*?)</blue>", "<font color=\"blue\">$1</font>");
+        //
+        text = text.replaceAll("<green>(.*?)</green>", "<font color=\"green\">$1</font>");
+//-----------------------------------------------------------------------------------------------------------------------
         // add message
-        JEditorPane textContainer = new JEditorPane("text/plain", text);
+        JEditorPane textContainer = new JEditorPane("text/html", text);
 
         // sizes the panel to attempt to take up the width of the container
         // and expand in height based on word wrapping
