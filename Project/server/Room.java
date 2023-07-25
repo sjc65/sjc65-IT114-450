@@ -23,6 +23,8 @@ public class Room implements AutoCloseable {
 	private final static String LOGOFF = "logoff";
 	private final static String FLIP = "flip";
 	private final static String ROLL = "roll";
+	private final static String MUTE = "mute";
+	private final static String UNMUTE = "unmute";
 	private static Logger logger = Logger.getLogger(Room.class.getName());
 
 	public Room(String name) {
@@ -143,6 +145,25 @@ public class Room implements AutoCloseable {
     	sendMessage(client, message);
 	}	
 	//---------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------
+/*
+ * UCID: sjc65
+ * Date: 07/25/2023
+ * Explanation: In the "muteUser" method, the username used in its parameters from the MUTE case is used
+ * in the parameters of "addToMutedUsers()", from the ServerThread, to be sent to the list of muted users. In the "unmuteUser" method,
+ * the username is used in the parameters of the "removeFromMutedUsers()" to be removed from the list of muted users.
+ */
+	private void muteUser(ServerThread client, String targetUsername) {
+        client.addToMutedUsers(targetUsername);
+        client.sendMessage(client.getClientId(), "You have muted user: " + targetUsername);
+    }
+
+    private void unmuteUser(ServerThread client, String targetUsername) {
+            client.removeFromMutedUsers(targetUsername);
+            client.sendMessage(client.getClientId(), "You have unmuted user: " + targetUsername);
+    }
+
+//---------------------------------------------------------------------------------------------------
 
 	/***
 	 * Helper function to process messages to trigger different functionality.
@@ -204,6 +225,31 @@ public class Room implements AutoCloseable {
 							wasCommand = true;
 							break;
 						}
+//------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------
+/*
+ * UCID: sjc65
+ * Date: 07/25/2023
+ * Explanation: The code checks for the cases of "mute" and "unmute" in the command. If MUTE is used then the username used in the
+ * full command text is sent to the "muteUser" method. If UNMUTE is used then the username used in the full command text is sent to
+ * the "unmuteUser" method.
+ */
+					case MUTE: 
+                        if (comm2.length > 1) {
+                            String targetUsername = comm2[1];
+							String target = targetUsername.trim().toLowerCase();
+                            muteUser(client, target);
+						}
+						wasCommand = true;
+                        break;
+                    case UNMUTE: 
+                        if (comm2.length > 1) {
+                            String targetUsername = comm2[1];
+							String target = targetUsername.trim().toLowerCase();
+                            unmuteUser(client, target);
+                        }
+						wasCommand = true;
+						break;
 //------------------------------------------------------------------------------------
 					default:
 						wasCommand = false;
@@ -299,10 +345,22 @@ public class Room implements AutoCloseable {
 			Iterator<ServerThread> iter = clients.iterator();
 			while (iter.hasNext()) {
 				ServerThread client = iter.next();
-				boolean messageSent = client.sendMessage(from, message);
-				if (!messageSent) {
-					handleDisconnect(iter, client);
+//-------------------------------------------------------------------------------------------------
+/*
+ * UCID: sjc65
+ * Date: 07/24/2023
+ * Explanation: The code checks if the target client is muted by the sender based on if the target is added to the
+ * mute list in ServerThread. The "messageSent" checks if the message is sent or not by using true or false. and lastly,
+ * the "!messageSent" if statement is used to remove the client from the "handleDisconnect" method so they can receive messages
+ * again.
+ */
+				if (!client.isMuted(sender != null ? sender.getClientName() : "")) {
+					boolean messageSent = client.sendMessage(from, message);
+					if (!messageSent) {
+						handleDisconnect(iter, client);
+					}
 				}
+//-------------------------------------------------------------------------------------------------
 			}
 		}
 	}
@@ -344,8 +402,7 @@ public class Room implements AutoCloseable {
 		synchronized (clients) {
 			for (int i = clients.size() - 1; i >= 0; i--) {
 				ServerThread client = clients.get(i);
-				boolean messageSent = client.sendConnectionStatus(sender.getClientId(), sender.getClientName(),
-						isConnected);
+				boolean messageSent = client.sendConnectionStatus(sender.getClientId(), sender.getClientName(), isConnected);
 				if (!messageSent) {
 					clients.remove(i);
 					info("Removed client " + client.getClientName());

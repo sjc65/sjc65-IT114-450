@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,6 +26,45 @@ public class ServerThread extends Thread {
     private Room currentRoom;
     private static Logger logger = Logger.getLogger(ServerThread.class.getName());
     private long myId;
+
+//----------------------------------------------------------------------------
+/*
+ * UCID: sjc65
+ * Date: 07/24/2023
+ * Explanation: The code creates a mutedUsers array list and a string variable called "users". The two methods, "addToMutedUsers"
+ * and "removeFromMutedUsers", add the user to the muted list if the user is not muted and removes the user from the mute list
+ * if the user is muted. Then the "isMuted()" method checks if a user is muted or not.
+ */
+    private List<String> mutedUsers = new ArrayList<>();
+    private String user = "";
+
+    // Returns list of muted users
+    public List<String> getMutedUsers() {
+        return mutedUsers;
+    }
+
+    // Adds users to the mute list
+    public synchronized void addToMutedUsers(String username) {
+        user = username.trim().toLowerCase();
+        if(!isMuted(user)) {
+            mutedUsers.add(user);
+        }
+    }
+
+    // Removes users from the mute list
+    public synchronized void removeFromMutedUsers(String username) {
+        user = username.trim().toLowerCase();
+        if(isMuted(user)) {
+            mutedUsers.remove(user);
+        }
+    }
+
+    // Checks if the specified user is muted or not and returns true or false
+    public synchronized boolean isMuted(String username) {
+        user = username.trim().toLowerCase();
+        return mutedUsers.contains(user);
+    }
+//----------------------------------------------------------------------------
 
     public void setClientId(long id) {
         myId = id;
