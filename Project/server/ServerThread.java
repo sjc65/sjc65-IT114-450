@@ -1,5 +1,9 @@
 package Project.server;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -64,7 +68,36 @@ public class ServerThread extends Thread {
         user = username.trim().toLowerCase();
         return mutedUsers.contains(user);
     }
-//----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------
+    // Method to export the mute list to a text file
+    public void exportMuteList() {
+        String fileName = getClientName() + "_mute_list.txt";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            for (String mutedUser : mutedUsers) {
+                writer.write(mutedUser);
+                writer.newLine();
+            }
+            System.out.println("Mute list exported to " + fileName);
+        } catch (IOException e) {
+            System.err.println("Error exporting mute list: " + e.getMessage());
+        }
+    }
+
+    // Method to import the mute list from a text file
+    public void importMuteList() {
+        String fileName = getClientName() + "_mute_list.txt";
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            String mutedUser;
+            while ((mutedUser = reader.readLine()) != null) {
+                addToMutedUsers(mutedUser);
+            }
+            System.out.println("Mute list imported from " + fileName);
+        } catch (IOException e) {
+            System.err.println("Error importing mute list: " + e.getMessage());
+        }
+    }
+//--------------------------------------------------------------------------------------------------------
 
     public void setClientId(long id) {
         myId = id;
