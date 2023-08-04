@@ -148,20 +148,53 @@ public class Room implements AutoCloseable {
 //---------------------------------------------------------------------------------------------------
 /*
  * UCID: sjc65
- * Date: 07/25/2023
+ * Date Created: 07/25/2023
+ * --->Date Modified: 08/04/2023
  * Explanation: In the "muteUser" method, the username used in its parameters from the MUTE case is used
  * in the parameters of "addToMutedUsers()", from the ServerThread, to be sent to the list of muted users. In the "unmuteUser" method,
  * the username is used in the parameters of the "removeFromMutedUsers()" to be removed from the list of muted users.
+ * 
+ * --> In the updated code, the target username is notified of the mute/unmute status. The updated code retrieves the target user's
+ * name from the parameters and assigns the targetUsername's client name to the ServerThread variable, targetClient. Then the message
+ * is sent to the targetClient notifiying them that the specified user has muted or unmuted them.
  */
 	private void muteUser(ServerThread client, String targetUsername) {
         client.addToMutedUsers(targetUsername);
-        client.sendMessage(client.getClientId(), "You have muted user: " + targetUsername);
+		// Inform the muted client about who muted them
+		ServerThread targetClient = findClientByUsername(targetUsername);
+    	if (targetClient != null) {
+        	targetClient.sendMessage(targetClient.getClientId(),
+			"(You have been <u>muted</u> by : <b>" + client.getClientName() + "</b>)");
+    	}
+		// Inform the client
+        client.sendMessage(client.getClientId(), "(You have <u>muted</u> : <b>" + targetUsername + "</b>)");
     }
 
     private void unmuteUser(ServerThread client, String targetUsername) {
-            client.removeFromMutedUsers(targetUsername);
-            client.sendMessage(client.getClientId(), "You have unmuted user: " + targetUsername);
+        client.removeFromMutedUsers(targetUsername);
+		// Inform the unmuted target user
+		ServerThread targetClient = findClientByUsername(targetUsername);
+    	if (targetClient != null) {
+        	targetClient.sendMessage(targetClient.getClientId(), 
+			"(You have been <u>unmuted</u> by : <b>" + client.getClientName() + "</b>)");
+    	}
+		// Inform the client
+		client.sendMessage(client.getClientId(), "(You have <u>unmuted</u> : <b>" + targetUsername + "</b>)");
     }
+
+//---------------------------------------------------------------------------------------------------
+// Retrieve the name of the client by their username
+private ServerThread findClientByUsername(String username) {
+    synchronized (clients) {
+        // For every client in list of clients
+		for (ServerThread client : clients) {
+            if (client.getClientName().equalsIgnoreCase(username)) {
+                return client;
+            }
+        }
+    }
+    return null;
+}
 
 //---------------------------------------------------------------------------------------------------
 
