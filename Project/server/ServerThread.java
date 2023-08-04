@@ -34,10 +34,15 @@ public class ServerThread extends Thread {
 //----------------------------------------------------------------------------
 /*
  * UCID: sjc65
- * Date: 07/24/2023
+ * Date Created: 07/24/2023
+ * --->Date Modified: 08/04/2023
  * Explanation: The code creates a mutedUsers array list and a string variable called "users". The two methods, "addToMutedUsers"
  * and "removeFromMutedUsers", add the user to the muted list if the user is not muted and removes the user from the mute list
- * if the user is muted. Then the "isMuted()" method checks if a user is muted or not.
+ * if the user is muted. Then the "isMuted()" method checks if a user is muted or not. 
+ * 
+ * --->The code also calls the "mutedUsersFile()"
+ * method. under each of the two methods, to update the mute list text file based on the status of the muter and the associated 
+ * muted usernames.
  */
     private List<String> mutedUsers = new ArrayList<>();
     private String user = "";
@@ -52,7 +57,8 @@ public class ServerThread extends Thread {
         user = username.trim().toLowerCase();
         if(!isMuted(user)) {
             mutedUsers.add(user);
-            writeMutedUsersToFile(clientName, user);
+            // Calls the method to write to the muted users text file
+            mutedUsersFile(clientName, user);
         }
     }
 
@@ -61,7 +67,8 @@ public class ServerThread extends Thread {
         user = username.trim().toLowerCase();
         if(isMuted(user)) {
             mutedUsers.remove(user);
-            removeFromMutedUsersFile(clientName, user);
+            // Calls the method to write to the muted users text file
+            mutedUsersFile(clientName, user);
         }
     }
 
@@ -72,34 +79,48 @@ public class ServerThread extends Thread {
     }
     // ----------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------
-   private void writeMutedUsersToFile(String muter, String mutedUser) {
-    try (BufferedWriter writer = new BufferedWriter(new FileWriter("mute_list.txt", true))) {
-        writer.write(muter + "," + mutedUser);
-        writer.newLine();
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-}
-
-private void removeFromMutedUsersFile(String muter, String mutedUser) {
+/*
+ *  UCID: sjc65
+ *  Date: 08/04/2023
+ *  Explanation: The mutedUsersFile() method creates and reads a text file that stores the muter and the muted information in
+ *  the file. The file stores the information per mute command call such as: sai,jay. Where sai is the muter and jay is the
+ *  muted. This method creates the text file by setting up the information structure in a list format, so each muter and muted
+ *  are seperated as a seperate entry. The "while" block is what writes the entries to the file, it trims the characters
+ *  to lower case in order to make it easier to read and then sets the "entryFound" boolean to true. The next block of code 
+ *  reads the text file looking for entries in the format: muter,muted. If the user is not muted and entryFound is set to true,
+ *  the muted user is removed from the list. If the user is muted and an entryFound is set to false, then the muted user is added
+ *  to the list.
+ */
+private void mutedUsersFile(String muter, String mutedUser) {
     try {
         List<String> lines = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new FileReader("mute_list.txt"));
         String line;
+        boolean entryFound = false;
+
         while ((line = reader.readLine()) != null) {
             String[] users = line.split(",");
             if (!(users.length == 2 && users[0].trim().equalsIgnoreCase(muter) && users[1].trim().equalsIgnoreCase(mutedUser))) {
                 lines.add(line);
+            } else {
+                entryFound = true;
             }
         }
         reader.close();
-        
-        BufferedWriter writer = new BufferedWriter(new FileWriter("mute_list.txt"));
-        for (String updatedLine : lines) {
-            writer.write(updatedLine);
+
+        if (!isMuted(mutedUser) && entryFound) {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("mute_list.txt"));
+            for (String updatedLine : lines) {
+                writer.write(updatedLine);
+                writer.newLine();
+            }
+            writer.close();
+        } else if (isMuted(mutedUser) && !entryFound) {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("mute_list.txt", true));
+            writer.write(muter + "," + mutedUser);
             writer.newLine();
+            writer.close();
         }
-        writer.close();
     } catch (IOException e) {
         e.printStackTrace();
     }
@@ -129,7 +150,14 @@ private void removeFromMutedUsersFile(String muter, String mutedUser) {
         this.currentRoom = room;
 
     }
-
+//-----------------------------------------------------------------------------------------------------------
+    /*
+     *  UCID: sjc65
+     *  Date: 08/04/2023
+     *  Explanation: This method is the second half of the implementation that reads from the mute_list.txt and uploads the 
+     *  muter and muted names when the method is called. The method reads from the text file, removes the comma and adds 
+     *  the muter and the associated muted to the "addToMutedUsers()" method.
+     */
     private void muteFromList() {
         try (BufferedReader reader = new BufferedReader(new FileReader("mute_list.txt"))) {
             String line;
@@ -143,6 +171,7 @@ private void removeFromMutedUsersFile(String muter, String mutedUser) {
             e.printStackTrace();
         }
     }
+//-----------------------------------------------------------------------------------------------------------
 
     protected void setClientName(String name) {
         if (name == null || name.isBlank()) {
@@ -303,11 +332,19 @@ private String formatText(String message) {
         switch (p.getPayloadType()) {
             case CONNECT:
                 setClientName(p.getClientName());
+            //------------------------------------------------------------
+            /*
+             * UCID: sjc65
+             * Date: 08/04/2023
+             * Explanation: retrieves every muted user from the list and sends it as a parameter to the "addToMutedUsers()" method call.
+             * The the "muteFromList()" method is called underneath to read from the mute list.
+             */
                 // Mute users based on the mutedUsers list
-            for (String mutedUser : mutedUsers) {
-                addToMutedUsers(mutedUser);
-            }
-            muteFromList();
+                for (String mutedUser : mutedUsers) {
+                    addToMutedUsers(mutedUser);
+                }
+                muteFromList();
+            //------------------------------------------------------------
                 break;
             case DISCONNECT:
                 Room.disconnectClient(this, getCurrentRoom());
