@@ -52,6 +52,7 @@ public class ServerThread extends Thread {
         user = username.trim().toLowerCase();
         if(!isMuted(user)) {
             mutedUsers.add(user);
+            writeMutedUsersToFile(clientName, user);
         }
     }
 
@@ -60,6 +61,7 @@ public class ServerThread extends Thread {
         user = username.trim().toLowerCase();
         if(isMuted(user)) {
             mutedUsers.remove(user);
+            removeFromMutedUsersFile(clientName, user);
         }
     }
 
@@ -70,33 +72,38 @@ public class ServerThread extends Thread {
     }
     // ----------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------
-    // Method to export the mute list to a text file
-    public void exportMuteList() {
-        String fileName = getClientName() + "_mute_list.txt";
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            for (String mutedUser : mutedUsers) {
-                writer.write(mutedUser);
-                writer.newLine();
-            }
-            System.out.println("Mute list exported to " + fileName);
-        } catch (IOException e) {
-            System.err.println("Error exporting mute list: " + e.getMessage());
-        }
+   private void writeMutedUsersToFile(String muter, String mutedUser) {
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter("mute_list.txt", true))) {
+        writer.write(muter + "," + mutedUser);
+        writer.newLine();
+    } catch (IOException e) {
+        e.printStackTrace();
     }
+}
 
-    // Method to import the mute list from a text file
-    public void importMuteList() {
-        String fileName = getClientName() + "_mute_list.txt";
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
-            String mutedUser;
-            while ((mutedUser = reader.readLine()) != null) {
-                addToMutedUsers(mutedUser);
+private void removeFromMutedUsersFile(String muter, String mutedUser) {
+    try {
+        List<String> lines = new ArrayList<>();
+        BufferedReader reader = new BufferedReader(new FileReader("mute_list.txt"));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String[] users = line.split(",");
+            if (!(users.length == 2 && users[0].trim().equalsIgnoreCase(muter) && users[1].trim().equalsIgnoreCase(mutedUser))) {
+                lines.add(line);
             }
-            System.out.println("Mute list imported from " + fileName);
-        } catch (IOException e) {
-            System.err.println("Error importing mute list: " + e.getMessage());
         }
+        reader.close();
+        
+        BufferedWriter writer = new BufferedWriter(new FileWriter("mute_list.txt"));
+        for (String updatedLine : lines) {
+            writer.write(updatedLine);
+            writer.newLine();
+        }
+        writer.close();
+    } catch (IOException e) {
+        e.printStackTrace();
     }
+}
 //--------------------------------------------------------------------------------------------------------
 
     public void setClientId(long id) {
@@ -121,6 +128,20 @@ public class ServerThread extends Thread {
         this.client = myClient;
         this.currentRoom = room;
 
+    }
+
+    private void muteFromList() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("mute_list.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] users = line.split(",");
+                if (users.length == 2 && users[0].trim().equalsIgnoreCase(getClientName())) {
+                    addToMutedUsers(users[1].trim().toLowerCase());
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     protected void setClientName(String name) {
@@ -282,6 +303,11 @@ private String formatText(String message) {
         switch (p.getPayloadType()) {
             case CONNECT:
                 setClientName(p.getClientName());
+                // Mute users based on the mutedUsers list
+            for (String mutedUser : mutedUsers) {
+                addToMutedUsers(mutedUser);
+            }
+            muteFromList();
                 break;
             case DISCONNECT:
                 Room.disconnectClient(this, getCurrentRoom());

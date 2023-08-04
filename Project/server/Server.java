@@ -75,10 +75,6 @@ public enum Server {
                             if (ic.isRunning() && ic.getClientName() != null) {
                                 handleIncomingClient(ic);
                                 incomingClients.poll();
-//--------------------------------------------------------------------------------------------------------
-                                // Imports the mute list from the text file
-                                ic.importMuteList();
-//--------------------------------------------------------------------------------------------------------
                             }
                         }
                     }
@@ -95,10 +91,6 @@ public enum Server {
             nextClientId = 1;
         }
         joinRoom("lobby", client);
-//---------------------------------------------------------------------------------------------------------
-        // Exports the mute list to a text file
-        client.exportMuteList();
-//---------------------------------------------------------------------------------------------------------
     }
 
     /***
