@@ -183,11 +183,12 @@ public class Room implements AutoCloseable {
     }
 
 //---------------------------------------------------------------------------------------------------
-// Retrieve the name of the client by their username
+// Retrieves the name of the client by their username
 private ServerThread findClientByUsername(String username) {
     synchronized (clients) {
         // For every client in list of clients
 		for (ServerThread client : clients) {
+			// Returns client name if the client name and target username are a match
             if (client.getClientName().equalsIgnoreCase(username)) {
                 return client;
             }
