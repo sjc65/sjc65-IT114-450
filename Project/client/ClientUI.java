@@ -23,6 +23,7 @@ import Project.client.views.ConnectionPanel;
 import Project.client.views.Menu;
 import Project.client.views.RoomsPanel;
 import Project.client.views.UserInputPanel;
+import Project.client.views.UserListPanel;
 import Project.common.Constants;
 
 public class ClientUI extends JFrame implements IClientEvents, ICardControls {
@@ -42,6 +43,7 @@ public class ClientUI extends JFrame implements IClientEvents, ICardControls {
     private UserInputPanel inputPanel;
     private RoomsPanel roomsPanel;
     private ChatPanel chatPanel;
+    private UserListPanel panel;
 
     public ClientUI(String title) {
         super(title);// call the parent's constructor
@@ -75,6 +77,7 @@ public class ClientUI extends JFrame implements IClientEvents, ICardControls {
         csPanel = new ConnectionPanel(this);
         inputPanel = new UserInputPanel(this);
         chatPanel = new ChatPanel(this);
+        panel = new UserListPanel(this);
         
         roomsPanel = new RoomsPanel(this);
 
@@ -212,6 +215,20 @@ public class ClientUI extends JFrame implements IClientEvents, ICardControls {
         if (currentCard.ordinal() >= Card.CHAT.ordinal()) {
             String clientName = mapClientId(clientId);
             chatPanel.addText(String.format("%s: %s", clientName, message));
+        // ------------------------------------------------------------------------------------------------
+        /*
+         *  UCID: sjc65
+         *  Date: 08/07/2023
+         *  Explanation: The code uses the UserListPanel panel object to call the setSenderID() method. The method
+         *  accepts the clientId from the OnMessageRecieve() method. The setSenderID(clientId) then assigns the clientId
+         *  to the senderID variable in UserListPanel
+         */
+        // NOTE: the UserListPanel already provides the client ID
+        panel.setSenderID(clientId);
+
+        // NOTE: logger checks if client ID was set for the senderID variable in UserListPanel
+        logger.log(Level.INFO,"CLIENT ID RECIEVED FROM USER LIST PANEL: " + panel.getSenderID());
+        // ------------------------------------------------------------------------------------------------
         }
     }
 
